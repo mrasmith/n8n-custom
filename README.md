@@ -1,3 +1,8 @@
 # n8n-custom
 
-Custom n8n Docker image installs ffmpeg, ImageMagick, and Tesseract OCR on top of the official n8n image
+## Image information
+
+- **Included n8n version:** <!-- N8N_VERSION -->Unknown<!-- /N8N_VERSION -->
+- **Last image build:** <!-- BUILD_DATE -->Unknown<!-- /BUILD_DATE -->
+
+This image includes FFmpeg, ImageMagick and Tesseract OCR.
