@@ -1,6 +1,7 @@
 FROM alpine:latest AS alpine
 
-FROM docker.n8n.io/n8nio/n8n:latest
+#FROM docker.n8n.io/n8nio/n8n:latest
+FROM n8nio/n8n:latest
 
 LABEL org.opencontainers.image.source="https://github.com/mrasmith/n8n-custom"
 
