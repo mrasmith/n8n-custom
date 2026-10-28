@@ -4,8 +4,14 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
+  # Check for a new n8n image every day
+  schedule:
+    - cron: '23 5 * * *'
+
+  # Allow manual builds
+  workflow_dispatch:
+  
 permissions:
   contents: read
   packages: write
