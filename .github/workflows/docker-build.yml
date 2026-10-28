@@ -4,16 +4,16 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - README.md
 
-  # Check for a new n8n image every day
   schedule:
     - cron: '23 5 * * *'
 
-  # Allow manual builds
   workflow_dispatch:
   
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -41,6 +41,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
+      - name: Detect n8n version
+        id: n8n-version
+        run: |
+          docker pull n8nio/n8n:latest
+          VERSION=$(docker run --rm --entrypoint n8n n8nio/n8n:latest --version)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Detected n8n version: $VERSION"
+
       - name: Build and publish image
         uses: docker/build-push-action@v7
         with:
@@ -50,3 +58,49 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Update README with n8n version
+        env:
+          N8N_VERSION: ${{ steps.n8n-version.outputs.version }}
+          BUILD_DATE: ${{ github.run_started_at }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text()
+
+          version = os.environ["N8N_VERSION"]
+          build_date = os.environ["BUILD_DATE"][:10]
+
+          text = re.sub(
+              r"<!-- N8N_VERSION -->.*?<!-- /N8N_VERSION -->",
+              f"<!-- N8N_VERSION -->{version}<!-- /N8N_VERSION -->",
+              text,
+              count=1,
+          )
+
+          text = re.sub(
+              r"<!-- BUILD_DATE -->.*?<!-- /BUILD_DATE -->",
+              f"<!-- BUILD_DATE -->{build_date}<!-- /BUILD_DATE -->",
+              text,
+              count=1,
+          )
+
+          path.write_text(text)
+          PY
+
+      - name: Commit README changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update README with n8n version"
+            git push
+          else
+            echo "README already up to date"
+          fi
