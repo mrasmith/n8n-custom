@@ -2,7 +2,7 @@
 
 ## Image information
 
-- **Included n8n version:** <!-- N8N_VERSION -->2.48.5<!-- /N8N_VERSION -->
+- **Included n8n version:** <!-- N8N_VERSION -->2.48.6<!-- /N8N_VERSION -->
 - **Last image build:** <!-- BUILD_DATE --><!-- /BUILD_DATE -->
 
 This image includes FFmpeg, ImageMagick and Tesseract OCR.
